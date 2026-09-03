@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Vox — Central de Atualização Cadastral</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    margin: 0; background: #0b0f19; color: #e2e8f0;
+  }
+  header {
+    background: linear-gradient(90deg, #1e293b, #0f172a);
+    padding: 18px 32px; border-bottom: 1px solid #334155;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .logo {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 800; font-size: 18px; letter-spacing: -0.03em;
+  }
+  header h1 { margin: 0; font-size: 20px; letter-spacing: -0.02em; }
+  header h1 span { color: #94a3b8; font-weight: 400; font-size: 13px; margin-left: 10px; }
+  .pill {
+    display: inline-block; padding: 4px 12px; border-radius: 999px;
+    font-size: 11px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase;
+    background: #4c1d95; color: #ddd6fe;
+  }
+  main {
+    display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px;
+    padding: 24px 32px; max-width: 1500px; margin: 0 auto;
+  }
+  section {
+    background: #1e293b; border: 1px solid #334155; border-radius: 12px;
+    padding: 18px 20px;
+  }
+  section h2 {
+    margin: 0 0 14px 0; font-size: 13px; text-transform: uppercase;
+    letter-spacing: 0.08em; color: #94a3b8; font-weight: 600;
+  }
+  .call-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 12px;
+  }
+  .from {
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    font-size: 15px; color: #93c5fd; margin-bottom: 10px;
+  }
+  .status {
+    padding: 3px 10px; border-radius: 999px;
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .status.live { background: #7c2d12; color: #fed7aa; animation: pulse 1.6s infinite; }
+  .status.ended { background: #334155; color: #cbd5e1; }
+  @keyframes pulse { 0%,100% { opacity: 1;} 50% { opacity: .55; } }
+  .transcript {
+    background: #0b0f19; border-radius: 8px; padding: 12px;
+    min-height: 340px; max-height: 500px; overflow-y: auto;
+    font-size: 14px; line-height: 1.5;
+  }
+  .turn { margin-bottom: 10px; }
+  .turn .who { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 3px; }
+  .turn.user .who { color: #93c5fd; }
+  .turn.assistant .who { color: #86efac; }
+  .empty { color: #64748b; text-align: center; padding: 40px 20px; font-size: 13px; }
+  .card {
+    background: #0b0f19; border-left: 3px solid #22c55e;
+    padding: 12px 14px; border-radius: 6px; margin-bottom: 10px;
+  }
+  .card.retorno { border-left-color: #f59e0b; }
+  .card.link    { border-left-color: #8b5cf6; }
+  .card .doc {
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    font-size: 13px; color: #93c5fd; margin-bottom: 4px;
+  }
+  .card .name { font-weight: 600; margin-bottom: 6px; }
+  .card .fields { font-size: 12px; color: #94a3b8; line-height: 1.5; }
+  .card .ts { font-size: 11px; color: #64748b; margin-top: 6px; }
+  .chan-badge {
+    display: inline-block; padding: 2px 8px; border-radius: 999px;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600;
+    margin-left: 6px;
+  }
+  .chan-badge.voz      { background: #7c2d12; color: #fed7aa; }
+  .chan-badge.web      { background: #1e3a8a; color: #bfdbfe; }
+  .chan-badge.sms      { background: #1e40af; color: #bfdbfe; }
+  .chan-badge.whatsapp { background: #14532d; color: #bbf7d0; }
+  .base-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .base-table th, .base-table td { padding: 6px 8px; text-align: left; border-bottom: 1px solid #334155; }
+  .base-table th { color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; font-size: 10px; }
+  .base-table td { color: #cbd5e1; font-family: ui-monospace, SFMono-Regular, monospace; }
+  .stack { display: flex; flex-direction: column; gap: 20px; }
+  .link-url {
+    display: block; font-family: ui-monospace, monospace; font-size: 11px;
+    color: #a78bfa; text-decoration: none; word-break: break-all; margin-top: 4px;
+  }
+  .link-url:hover { color: #c4b5fd; }
+</style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo">V</div>
+      <h1>Vox
+        <span>Central de Atualização Cadastral · assistente Sofia</span>
+      </h1>
+    </div>
+    <span class="pill">Twilio ConversationRelay + Conversations</span>
+  </header>
+
+  <main>
+    <section id="call-panel">
+      <div class="call-header">
+        <h2 style="margin:0">Chamada em andamento</h2>
+        <span id="status" class="status ended">aguardando</span>
+      </div>
+      <div id="from" class="from">—</div>
+      <div id="transcript" class="transcript">
+        <div class="empty">Sem chamada ativa. Ligue para <b>+55 11 5039-6311</b> para começar.</div>
+      </div>
+    </section>
+
+    <div class="stack">
+      <section>
+        <h2>Cadastros salvos hoje <span id="ct-cad" style="color:#22c55e;">(0)</span></h2>
+        <div id="cadastros"><div class="empty">Nenhum ainda.</div></div>
+      </section>
+
+      <section>
+        <h2>Links enviados <span id="ct-link" style="color:#a78bfa;">(0)</span></h2>
+        <div id="links"><div class="empty">Nenhum ainda.</div></div>
+      </section>
+
+      <section>
+        <h2>Retornos agendados <span id="ct-ret" style="color:#f59e0b;">(0)</span></h2>
+        <div id="retornos"><div class="empty">Nenhum ainda.</div></div>
+      </section>
+
+      <section>
+        <h2>Base de participantes (mock)</h2>
+        <table class="base-table">
+          <thead><tr><th>Documento</th><th>Nome</th><th>Últ. atualização</th></tr></thead>
+          <tbody id="base"></tbody>
+        </table>
+      </section>
+    </div>
+  </main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const fmtTime = (ts) => new Date(ts).toLocaleTimeString('pt-BR');
+
+let ativos = [];
+let cadastros = [];
+let retornos = [];
+let links = [];
+
+function renderCall() {
+  const s = ativos[0];
+  if (!s) {
+    $('status').className = 'status ended';
+    $('status').textContent = 'aguardando';
+    $('from').textContent = '—';
+    $('transcript').innerHTML = '<div class="empty">Sem chamada ativa. Ligue para <b>+55 11 5039-6311</b> para começar.</div>';
+    return;
+  }
+  $('status').className = s.ended ? 'status ended' : 'status live';
+  $('status').textContent = s.ended ? 'encerrada' : 'ao vivo';
+  $('from').textContent = s.from;
+  if (!s.turns.length) {
+    $('transcript').innerHTML = '<div class="empty">Aguardando a primeira fala...</div>';
+    return;
+  }
+  $('transcript').innerHTML = s.turns.map(t => `
+    <div class="turn ${t.role}">
+      <div class="who">${t.role === 'user' ? '👤 Cliente' : '🤖 Sofia'} · ${fmtTime(t.ts)}</div>
+      <div class="text">${escapeHtml(t.text)}</div>
+    </div>
+  `).join('');
+  $('transcript').scrollTop = $('transcript').scrollHeight;
+}
+
+function renderCadastros() {
+  $('ct-cad').textContent = `(${cadastros.length})`;
+  if (!cadastros.length) {
+    $('cadastros').innerHTML = '<div class="empty">Nenhum ainda.</div>';
+    return;
+  }
+  $('cadastros').innerHTML = cadastros.map(c => `
+    <div class="card">
+      <div class="doc">${escapeHtml(c.documento)}<span class="chan-badge ${c.canal || 'voz'}">${c.canal || 'voz'}</span></div>
+      <div class="name">${escapeHtml(c.nome)}</div>
+      <div class="fields">
+        📅 ${escapeHtml(c.data_nascimento)}<br>
+        📍 ${escapeHtml(c.endereco)}<br>
+        📞 ${escapeHtml(c.telefone)}<br>
+        ✉️ ${escapeHtml(c.email)}
+      </div>
+      <div class="ts">Salvo às ${new Date(c.salvo_em).toLocaleTimeString('pt-BR')}</div>
+    </div>
+  `).join('');
+}
+
+function renderLinks() {
+  $('ct-link').textContent = `(${links.length})`;
+  if (!links.length) {
+    $('links').innerHTML = '<div class="empty">Nenhum ainda.</div>';
+    return;
+  }
+  $('links').innerHTML = links.map(l => `
+    <div class="card link">
+      <div class="doc">${escapeHtml(l.documento)}<span class="chan-badge ${l.canal}">${l.canal}</span></div>
+      <div class="name">→ ${escapeHtml(l.destino)}</div>
+      <a class="link-url" href="${escapeHtml(l.url)}" target="_blank">${escapeHtml(l.url)}</a>
+      <div class="ts">${escapeHtml(l.status)} às ${new Date(l.enviado_em).toLocaleTimeString('pt-BR')}${l.erro ? ' — ' + escapeHtml(l.erro) : ''}</div>
+    </div>
+  `).join('');
+}
+
+function renderRetornos() {
+  $('ct-ret').textContent = `(${retornos.length})`;
+  if (!retornos.length) {
+    $('retornos').innerHTML = '<div class="empty">Nenhum ainda.</div>';
+    return;
+  }
+  $('retornos').innerHTML = retornos.map(r => `
+    <div class="card retorno">
+      <div class="doc">${escapeHtml(r.documento || '—')} · ${escapeHtml(r.from)}</div>
+      <div class="name">${escapeHtml(r.motivo)}</div>
+      <div class="ts">Agendado às ${new Date(r.agendado_em).toLocaleTimeString('pt-BR')}</div>
+    </div>
+  `).join('');
+}
+
+async function loadBase() {
+  const r = await fetch('/api/base');
+  const data = await r.json();
+  $('base').innerHTML = data.map(p => `
+    <tr>
+      <td>${escapeHtml(p.documento)}</td>
+      <td style="font-family:inherit; color:#e2e8f0">${escapeHtml(p.nome)}</td>
+      <td>${escapeHtml(p.ultima_atualizacao)}</td>
+    </tr>
+  `).join('');
+}
+
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
+
+const es = new EventSource('/stream');
+es.addEventListener('snapshot', (e) => {
+  const d = JSON.parse(e.data);
+  ativos = d.ativos || [];
+  cadastros = d.cadastrosSalvos || [];
+  retornos = d.retornosAgendados || [];
+  links = d.linksEnviados || [];
+  renderCall(); renderCadastros(); renderRetornos(); renderLinks();
+  loadBase();
+});
+es.addEventListener('session-start', (e) => {
+  const d = JSON.parse(e.data);
+  ativos = [{ callSid: d.callSid, from: d.from, startedAt: d.startedAt, turns: [], ended: false }];
+  renderCall();
+});
+es.addEventListener('session-end', (e) => {
+  const d = JSON.parse(e.data);
+  ativos = ativos.map(s => s.callSid === d.callSid ? {...s, ended: true} : s);
+  renderCall();
+});
+es.addEventListener('turn', (e) => {
+  const d = JSON.parse(e.data);
+  ativos = ativos.map(s => s.callSid === d.callSid ? {...s, turns: [...s.turns, d.turn]} : s);
+  renderCall();
+});
+es.addEventListener('cadastro-salvo', (e) => {
+  const d = JSON.parse(e.data);
+  cadastros = [d.record, ...cadastros];
+  renderCadastros();
+  loadBase(); // base foi atualizada
+});
+es.addEventListener('retorno-agendado', (e) => {
+  const d = JSON.parse(e.data);
+  retornos = [d.record, ...retornos];
+  renderRetornos();
+});
+es.addEventListener('link-enviado', (e) => {
+  const d = JSON.parse(e.data);
+  links = [d.record, ...links];
+  renderLinks();
+});
+
+loadBase();
+</script>
+</body>
+</html>

@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vox — Atualização Cadastral</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f7f9fc; color: #0f172a; min-height: 100vh;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+  .wrap { max-width: 480px; margin: 0 auto; padding: 20px 16px 40px; }
+  header {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 4px;
+  }
+  .logo {
+    width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 800; font-size: 18px; letter-spacing: -0.03em;
+  }
+  header h1 { margin: 0; font-size: 17px; letter-spacing: -0.02em; line-height: 1.25; }
+  header h1 span { display: block; font-size: 12px; color: #64748b; font-weight: 400; margin-top: 3px; line-height: 1.3; }
+  .card {
+    background: white; border-radius: 14px; padding: 20px 18px 24px;
+    box-shadow: 0 1px 3px rgba(15,23,42,0.06), 0 8px 24px rgba(15,23,42,0.04);
+    margin-top: 16px;
+  }
+  .hello {
+    background: linear-gradient(135deg, #eef2ff, #faf5ff);
+    padding: 14px 16px; border-radius: 10px; margin-bottom: 20px;
+    font-size: 14px; color: #4c1d95; line-height: 1.5;
+  }
+  .hello p { margin: 0 0 10px; }
+  .hello p:last-child { margin-bottom: 0; }
+  .hello b { color: #312e81; }
+  .doc-badge {
+    display: inline-block; background: white; color: #4338ca;
+    padding: 4px 10px; border-radius: 999px; font-size: 12px;
+    font-family: ui-monospace, SFMono-Regular, monospace;
+    border: 1px solid #e0e7ff; font-weight: 600;
+  }
+  label {
+    display: block; font-size: 11px; font-weight: 600; color: #475569;
+    text-transform: uppercase; letter-spacing: 0.05em; margin: 0 0 6px;
+  }
+  input {
+    display: block;
+    width: 100%; padding: 12px 14px; font-size: 16px; font-family: inherit;
+    border: 1px solid #e2e8f0; border-radius: 8px; background: #fbfcfe;
+    transition: border-color 0.15s, background 0.15s;
+    min-width: 0; min-height: 46px;
+    -webkit-appearance: none; -moz-appearance: none; appearance: none;
+  }
+  input[type="date"] {
+    -webkit-appearance: none; appearance: none;
+    line-height: 1.2;
+  }
+  input:focus { outline: none; border-color: #6366f1; background: white; }
+  .field { margin-bottom: 14px; }
+  .field:last-of-type { margin-bottom: 18px; }
+  .field-hint { font-size: 11px; color: #94a3b8; margin-top: 6px; line-height: 1.4; }
+  .row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    align-items: start; margin-bottom: 14px;
+  }
+  .row .field { margin-bottom: 0; min-width: 0; }
+  @media (max-width: 380px) {
+    .row { grid-template-columns: 1fr; gap: 0; }
+    .row .field { margin-bottom: 14px; }
+    .row .field:last-child { margin-bottom: 0; }
+  }
+  button {
+    width: 100%; padding: 14px; font-size: 15px; font-weight: 600;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white;
+    border: none; border-radius: 10px; cursor: pointer; margin-top: 4px;
+    transition: transform 0.1s, opacity 0.15s;
+  }
+  button:hover { opacity: 0.94; }
+  button:active { transform: scale(0.99); }
+  button:disabled { opacity: 0.6; cursor: not-allowed; }
+  .footer { text-align: center; margin-top: 20px; font-size: 11px; color: #94a3b8; padding: 0 8px; line-height: 1.5; }
+  .success {
+    display: none; text-align: center; padding: 40px 20px;
+  }
+  .success svg { width: 56px; height: 56px; color: #22c55e; }
+  .success h2 { margin: 12px 0 6px; font-size: 20px; }
+  .success p { color: #64748b; font-size: 14px; margin: 0; }
+  .err {
+    display: none; background: #fef2f2; color: #991b1b; padding: 10px 14px;
+    border-radius: 8px; font-size: 13px; margin-bottom: 12px;
+    border: 1px solid #fecaca;
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">V</div>
+      <h1>Vox<span>Central de Atendimento — Atualização Cadastral</span></h1>
+    </header>
+
+    <div class="card" id="card">
+      <div class="hello" id="hello">Carregando...</div>
+      <div class="err" id="err"></div>
+      <form id="form">
+        <div class="field">
+          <label>Nome completo</label>
+          <input name="nome" required>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label>Data de nascimento</label>
+            <input name="data_nascimento" type="date" required>
+          </div>
+          <div class="field">
+            <label>Telefone (DDD)</label>
+            <input name="telefone" placeholder="(11) 98811-2233" required>
+          </div>
+        </div>
+        <div class="field">
+          <label>E-mail</label>
+          <input name="email" type="email" required>
+        </div>
+        <div class="field">
+          <label>Endereço completo</label>
+          <input name="endereco" placeholder="Rua, número, bairro, cidade/UF" required>
+        </div>
+        <button type="submit" id="submit">Confirmar atualização</button>
+      </form>
+    </div>
+
+    <div class="card success" id="success">
+      <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+      <h2>Cadastro atualizado</h2>
+      <p>Recebemos suas informações. Se precisar, é só ligar de novo pra Central Vox.</p>
+    </div>
+
+    <div class="footer">Vox · atendimento em conformidade com Anvisa · Torre Health</div>
+  </div>
+
+<script>
+const token = location.pathname.split('/').pop();
+const $ = (id) => document.getElementById(id);
+
+async function load() {
+  try {
+    const r = await fetch(`/atualizar/${token}/data`);
+    if (!r.ok) throw new Error((await r.json()).erro || 'erro');
+    const d = await r.json();
+    const firstName = (d.nome || '').split(' ')[0] || 'você';
+    $('hello').innerHTML = `
+      <p>Olá, <b>${escapeHtml(firstName)}</b>! Já pré-preenchemos com o que temos aqui. Confirme ou ajuste o que mudou.</p>
+      <p><span class="doc-badge">${escapeHtml(d.documento)}</span></p>`;
+    for (const [k, v] of Object.entries({
+      nome: d.nome, data_nascimento: d.data_nascimento,
+      telefone: d.telefone, email: d.email, endereco: d.endereco,
+    })) {
+      const el = document.querySelector(`[name="${k}"]`);
+      if (el) el.value = v || '';
+    }
+  } catch (e) {
+    $('hello').textContent = 'Link inválido ou expirado. Por favor ligue de volta pra Central Vox.';
+    document.getElementById('form').style.display = 'none';
+  }
+}
+
+$('form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  $('err').style.display = 'none';
+  const submit = $('submit');
+  submit.disabled = true; submit.textContent = 'Salvando...';
+  const fd = new FormData(e.target);
+  const body = Object.fromEntries(fd);
+  try {
+    const r = await fetch(`/atualizar/${token}/data`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!r.ok) throw new Error('erro ao salvar');
+    $('card').style.display = 'none';
+    $('success').style.display = 'block';
+  } catch (e) {
+    $('err').style.display = 'block';
+    $('err').textContent = 'Não consegui salvar. Tente novamente.';
+    submit.disabled = false; submit.textContent = 'Confirmar atualização';
+  }
+});
+
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+load();
+</script>
+</body>
+</html>

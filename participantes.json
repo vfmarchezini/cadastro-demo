@@ -1,0 +1,52 @@
+[
+  {
+    "documento": "12345678900",
+    "tipo": "CPF",
+    "nome": "Maria da Silva Santos",
+    "data_nascimento": "1978-03-14",
+    "telefone": "",
+    "email": "",
+    "endereco": "",
+    "ultima_atualizacao": "2022-11-08"
+  },
+  {
+    "documento": "98765432100",
+    "tipo": "CPF",
+    "nome": "João Pereira de Andrade",
+    "data_nascimento": "1965-09-02",
+    "telefone": "(11) 98811-2233",
+    "email": "joao.andrade@email.com",
+    "endereco": "Rua das Palmeiras, 128 — São Paulo/SP",
+    "ultima_atualizacao": "2024-05-21"
+  },
+  {
+    "documento": "11122233344",
+    "tipo": "CPF",
+    "nome": "Ana Beatriz Nogueira",
+    "data_nascimento": "1990-01-25",
+    "telefone": "",
+    "email": "ana.nog@email.com",
+    "endereco": "",
+    "ultima_atualizacao": "2023-02-10"
+  },
+  {
+    "documento": "30012345678",
+    "tipo": "CPF",
+    "nome": "Rui Manuel Patrício",
+    "data_nascimento": "1985-06-12",
+    "telefone": "(11) 96922-2122",
+    "email": "rui.patricio@email.com",
+    "endereco": "Av. Paulista, 1578, apto 92 — Bela Vista, São Paulo/SP, CEP 01310-200",
+    "ultima_atualizacao": "2023-04-18"
+  },
+  {
+    "documento": "FF123456",
+    "tipo": "Passaporte",
+    "nome": "Carlos Vieira Costa",
+    "data_nascimento": "1982-07-19",
+    "telefone": "",
+    "email": "",
+    "endereco": "",
+    "ultima_atualizacao": "2021-06-30"
+  }
+]
